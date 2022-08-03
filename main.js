@@ -1,96 +1,93 @@
-let arr = ['Rock', 'Paper', 'Scissors'];
-let gameType;
+let arr = ["Rock", "Paper", "Scissors"];
 
-// Decide if the player wants a single or 5-round game.
-do {
-    gameType = prompt("Please enter single or multiple for the type of game you wish to play.");
-    gameType = gameType.toLowerCase();
-    console.log(gameType);
-}
-while (gameType !== "single" && gameType!=="multiple")
+let buttons = document.querySelectorAll('button');
+buttons = Array.from(buttons);
+// console.log(buttons)
 
-if (gameType === "single") {
-    // Get user input and format the string so that only the first letter is capitalised.
-    let playerChoice;
-    let firstLetter;
-    do {
-        playerChoice = prompt("Please choose rock, paper or scissors: ");
-        firstLetter = playerChoice.charAt(0).toUpperCase();
-        playerChoice = playerChoice.slice(1).toLowerCase();
-        playerChoice = firstLetter + playerChoice;
-    }
-    while (playerChoice !== "Rock" && playerChoice!=="Paper" && playerChoice!=="Scissors")
-    
-    console.log(`Player choice = ${playerChoice}`);
+// Creating Event Listeners
+let playerChoice;
+let computerSelection;
+let player_wins = 0;
+let computer_wins = 0;
 
-    // Get computer's choice.
-    let computerSelection = getComputerChoice();
-    console.log(`Computer Choice: ${computerSelection}`);
-    console.log(playSingleRound(playerChoice, computerSelection));
-} else {
-    console.log(game());
-}
+// Result Divs
+let resultDiv = document.getElementById('result');
+counter = document.createElement('p');
+counter.innerText = `Player ${player_wins} : ${computer_wins} Computer`;
+resultDiv.appendChild(counter);
+let roundWinner = document.createElement('p');
+roundWinner.innerText = "Play your first round! Best of five. Don't get slapped!";
+resultDiv.appendChild(roundWinner);
+let winner;
+let loser;
+
+buttons.forEach ((button) => {
+    button.addEventListener('click', () => {
+        playerChoice = button.innerText;
+        computerSelection = getComputerChoice();
+        //console.log(playerChoice);
+        //console.log(computerSelection);
+        playRound(playerChoice, computerSelection);
+        console.log(player_wins, computer_wins);
+
+        if (player_wins >= 5 || computer_wins >= 5) {
+            announceWinner();
+            resultDiv.removeChild(roundWinner);
+        }
+        else {
+            
+            resultDiv.appendChild(roundWinner);
+        }
+
+    })});
 
 
-
-// Computer will generate a random number between 0 and 2 and then returned it corresponding value in the array.
+// Get computers random selection.
 function getComputerChoice () {
     let choice = Math.floor(Math.random()*3);
     return arr[choice];
 }
 
-// Simulate a single round.
-function playSingleRound (playerChoice, computerSelection) {
-    
+// playRound function.
+function playRound() {
 
-    // For player to win.
+    // If player wins.
     if ((playerChoice === "Rock" && computerSelection === "Scissors") || (playerChoice === "Paper" && computerSelection === "Rock") || (playerChoice === "Scissors" && computerSelection === "Paper")) {
-        return `You win. ${playerChoice} beats ${computerSelection}.`
+        player_wins++;
+        if (playerChoice === "Rock") roundWinner.innerText = "Congratulations! Your bad jokes broke those scissors in half!";
+        else if (playerChoice === "Paper") roundWinner.innerText = "You chose paper and slapped the shit out of Rock to prove it. Well done!"
+        else roundWinner.innerText = "You entangled paper with your scissors. Awesome!"
+        counter.innerText = `Player ${player_wins} : ${computer_wins} Computer`;
+        
+    }
 
-    } 
-    // For computer to win.
-    else if ((computerSelection === "Rock" && playerChoice === "Scissors") || (computerSelection === "Paper" && playerChoice === "Rock") || (playerChoice === "Scissors" && computerSelection === "Paper")) {
-        return `You lose. ${computerSelection} beats ${playerChoice}.`;
-    } 
-    
-    // For computer and player to draw.
+    else if ((computerSelection === "Rock" && playerChoice === "Scissors") || (computerSelection === "Paper" && playerChoice === "Rock") || (computerSelection === "Scissors" && playerChoice === "Paper")) {
+        computer_wins++;
+        if (computerSelection === "Rock") roundWinner.innerText = "Computer's bad jokes have made you cry. Computer wins this round.";
+        else if (computerSelection === "Paper") roundWinner.innerText = "Unlucky! The computer's paper slapped the words right out of your mouth!"
+        else roundWinner.innerText = "The computer's scissors have entangled you. Good luck getting out of this one!"
+        counter.innerText = `Player ${player_wins} : ${computer_wins} Computer`;
+        counter.innerText = `Player ${player_wins} : ${computer_wins} Computer`;
+        
+    }
+
+    else 
+    roundWinner.innerText = "Draw!";
+    };
+
+// announceWinner
+function announceWinner() {
+    resultDiv.removeChild(counter);
+    winner = document.createElement('h2');
+
+    if (player_wins === 5) {
+        winner.innerText = `Congratulations! You have beaten the computer ${player_wins} - ${computer_wins} and saved the Earth!`;
+    }
     else {
-        return `You draw. ${computerSelection} can't beat ${playerChoice}.`;
+        winner.innerText = `You suck! The computer kicked your ass ${computer_wins} - ${player_wins} and the world has been destroyed. Your mum would be so disappointed...but you just got her killed so it doesn\'t matter anyway!`;
     }
 
-}
+    resultDiv.appendChild(winner);
 
-// Simulate multiple rounds.
-function game() {
-    let computer = 0;
-    let player = 0;
-    let playerChoice;
-    let computerSelection;
-    let firstLetter;
-    let winner;
 
-    for (let i = 0; i < 5; i++) {
-
-        do {
-            playerChoice = prompt("Please choose rock, paper or scissors: ");
-            firstLetter = playerChoice.charAt(0).toUpperCase();
-            playerChoice = playerChoice.slice(1).toLowerCase();
-            playerChoice = firstLetter + playerChoice;
-        }
-        while (playerChoice !== "Rock" && playerChoice!=="Paper" && playerChoice!=="Scissors")
-
-        computerSelection = getComputerChoice()
-
-        winner = playSingleRound(playerChoice, computerSelection);
-        winner = winner.charAt(4);
-        if (winner === "w") player++; else if (winner === "l") computer++;
-    }
-
-    if (computer > player) {
-        return `You lose. Computer wins ${computer} - ${player}.`;
-    } else if (player > computer) {
-        return `You win. Player wins ${player} - ${computer}.`;
-    } else {
-        return `You draw ${computer} - ${player}.`;
-    }
 }
